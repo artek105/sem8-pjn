@@ -8,7 +8,7 @@ def get_base_n_grams(lang, n, cache=True):
     filename = './cache/' + lang + '_' + str(n) + '.json'
 
     if cache and exists(filename):
-        with open(filename) as file:
+        with open(filename, 'r') as file:
             return NGrams(n, json.load(file))
 
     n_grams = get_lang_n_grams(lang, n)

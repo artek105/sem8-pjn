@@ -5,6 +5,11 @@ from lab1.base import get_base_n_grams
 
 def main():
     n = 3
+    # test_single(n)
+    stats(n)
+
+
+def test_single(n):
     test = NGrams(n)
 
     # eng
@@ -20,9 +25,81 @@ def main():
     # sp
     # test.fit_by_text("Ganado correo operas cuerpo sirvio la manera lo es. En lacrimoso pelagatos insomnios ha ti expresion el. Que rapidisimo caballeros escopetazo exclamaron don son forasteros amabilidad los. Dias gr hago lema baja toco moza eh en. Dos corrian iba declaro sentido nos exigian pre ceguera. Cogio rio sus hay angel senas sabra feo arena. Explico pistola cuantos fuertes mal muy pequeno andando. Esposo evitar crespo es ya esposa al cuerda. ")
 
+    lang = resolve_lang(test, True)
+    print('Resolved lang: ', lang)
+
+
+def resolve_lang(n_grams, debug=False):
+    min_norm = 1
+    min_norm_lang = None
     for lang in languages:
+        lang_n_grams = get_base_n_grams(lang, n_grams.n)
+        norm_val = norm(n_grams, lang_n_grams)
+
+        if norm_val < min_norm:
+            min_norm = norm_val
+            min_norm_lang = lang
+
+        if debug:
+            print(lang, norm_val)
+
+    return min_norm_lang
+
+
+boundaries = {
+    1: 0.04,
+    2: 0.275,
+    3: 0.65,
+    4: 0.875,
+}
+
+
+def stats(n):
+    for lang in languages:
+        # to calculate recall and precision for all classes move this out of first loop
+        true_positive = true_negative = false_positive = false_negative = 0
+
         n_grams = get_base_n_grams(lang, n)
-        print(lang, norm(n_grams, test))
+        for test_lang in languages:
+            with open('examples/' + test_lang + '.txt', mode='r', encoding='utf-8') as file:
+                for line in file:
+                    # filter empty lines
+                    line = line.replace('\n', ' ').strip()
+                    if not line:
+                        continue
+
+                    test = NGrams(n)
+                    test.fit_by_text(line)
+
+                    norm_val = norm(n_grams, test)
+                    boundary = boundaries[n] if boundaries[n] is not None else 1
+                    predicted_same_lang = norm_val <= boundary
+
+                    if lang == test_lang and predicted_same_lang:
+                        true_positive += 1
+
+                    if lang != test_lang and not predicted_same_lang:
+                        true_negative += 1
+
+                    if lang != test_lang and predicted_same_lang:
+                        false_positive += 1
+
+                    if lang == test_lang and not predicted_same_lang:
+                        false_negative += 1
+
+        # to calculate recall and precision for all classes move this out of first loop
+        print('\t' + lang)
+        print_stats(true_positive, false_positive, false_negative, true_negative)
+
+
+def print_stats(true_positive, false_positive, false_negative, true_negative):
+    precision = true_positive / (true_positive + false_positive)
+    recall = true_positive / (true_positive + false_negative)
+    accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
+
+    print('precision\t', precision)
+    print('recall\t\t', recall)
+    print('accuracy\t', accuracy)
 
 
 if __name__ == '__main__':

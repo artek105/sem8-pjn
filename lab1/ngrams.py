@@ -4,7 +4,7 @@ class NGrams:
         self.n = n
 
     def fit_by_file(self, filename, encoding=None):
-        with open(filename, encoding=encoding) as file:
+        with open(filename, encoding=encoding, mode='r') as file:
             for line in file:
                 self.fit_by_text(line)
 
@@ -28,13 +28,13 @@ class NGrams:
         return n_grams
 
 
-def norm(base, n_grams_map):
-    if len(base.map) == 0 or len(n_grams_map.map) == 0:
+def norm(base, n_grams):
+    if len(base.map) == 0 or len(n_grams.map) == 0:
         return 1
 
     _sum = len_base = len_x = 0
     for n_gram, value_base in base.map.items():
-        value_x = n_grams_map.map.get(n_gram)
+        value_x = n_grams.map.get(n_gram)
         value_x = 0 if value_x is None else value_x
 
         _sum += value_x * value_base
