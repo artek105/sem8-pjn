@@ -1,7 +1,7 @@
-from langhelper import get_lang_n_grams
+from lab1.langhelper import get_lang_n_grams
 import json
 from os.path import exists
-from ngrams import NGrams
+from lab1.ngrams import NGrams
 
 
 def get_base_n_grams(lang, n, cache=True):

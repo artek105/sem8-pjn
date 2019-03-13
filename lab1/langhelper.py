@@ -1,4 +1,4 @@
-from ngrams import NGrams
+from lab1.ngrams import NGrams
 from os.path import exists
 
 
