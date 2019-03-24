@@ -3,18 +3,16 @@ class NGrams:
         self.map = {} if _map is None else _map
         self.n = n
 
-    def fit_by_file(self, filename, encoding=None):
+    def apply_file(self, filename, encoding=None):
         with open(filename, encoding=encoding, mode='r') as file:
             for line in file:
-                self.fit_by_text(line)
+                self.apply_text(line)
 
-    def fit_by_text(self, text):
+    def apply_text(self, text, count=1):
         for word in self.parse_line(text).split():
             n_grams = self.collect_n_grams(word)
             for n_gram in n_grams:
-                count = self.map.get(n_gram)
-                new_count = 1 if count is None else (count + 1)
-                self.map[n_gram] = new_count
+                self.map[n_gram] = count if n_gram not in self.map else (self.map[n_gram] + count)
 
     @staticmethod
     def parse_line(line):

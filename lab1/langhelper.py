@@ -24,7 +24,7 @@ def get_lang_n_grams(lang, n):
         path = './texts/' + filename
         if not exists(path):
             return n_grams
-        n_grams.fit_by_file(path, get_encoding(lang))
+        n_grams.apply_file(path, get_encoding(lang))
         i += 1
 
 

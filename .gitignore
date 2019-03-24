@@ -1,4 +1,5 @@
 .idea
 **/__pycache__
 
-lab1/cache
+**/cache
+lab2/results
