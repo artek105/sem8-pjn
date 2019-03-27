@@ -2,10 +2,11 @@ from lab1.ngrams import NGrams
 from lab2.sjp.dictionary import Dictionary
 import matplotlib.pyplot as plt
 import json
+import math
 
 
 def main():
-    hw4()
+    hw3()
 
 
 def hw4():
@@ -20,7 +21,6 @@ def hw4():
 
         print(ngrams_2.map)
         print(ngrams_3.map)
-        pass
 
 
 def hw3():
@@ -45,34 +45,45 @@ def hw3():
             if half <= 0:
                 break
 
-        print('words in text:', len(data))
+        print('basic words in text:', len(data))
         print('hapax legomena:', hl)
         print('50% of text consist of:', size, 'words')
 
 
-def hw2():
+def hw2(n=None):
     with open('./cache/potop.basics.cache.json') as file:
         data = json.load(file)
         data = sorted(data.items(), key=lambda kv: (kv[1], kv[0]))[::-1]
 
-        n = 50
+        n = len(data) if n is None else n
         y = [y for x, y in data][:n]
 
         plt.plot(y, 'g')
 
         # zipf
         k = 25000
-        z = [k / x for x in range(1, n)]
+        z = [k / x if x != 0 else math.inf for x in range(n)]
         plt.plot(z, 'r', label='zipf')
 
         # mandelbrot
         P = 37500
         B = 1
         d = .5
-        m = [P / ((x + d) ** B) for x in range(1, n)]
+        m = [P / ((x + d) ** B) if x != 0 else math.inf for x in range(n)]
         plt.plot(m, 'b', label='mandelbrot')
 
         plt.legend()
+        plt.show()
+
+
+def hw1(n=None):
+    with open('./cache/potop.basics.cache.json') as file:
+        data = json.load(file)
+        data = sorted(data.items(), key=lambda kv: (kv[1], kv[0]))[::-1]
+
+        n = len(data) if n is None else n
+        y = [y for x, y in data][:n]
+        plt.plot(y, 'ro')
         plt.show()
 
 
