@@ -3,10 +3,11 @@ from lab2.sjp.dictionary import Dictionary
 import matplotlib.pyplot as plt
 import json
 import math
+from scipy.optimize import curve_fit
 
 
 def main():
-    hw3()
+    hw4()
 
 
 def hw4():
@@ -19,8 +20,21 @@ def hw4():
             ngrams_2.apply_text(word, count)
             ngrams_3.apply_text(word, count)
 
-        print(ngrams_2.map)
-        print(ngrams_3.map)
+        n = 50
+        print_n_grams(ngrams_2, n)
+        print_n_grams(ngrams_3, n)
+
+
+def print_n_grams(ngrams, n):
+    data = sorted(ngrams.map.items(), key=lambda kv: (kv[1], kv[0]))[::-1]
+
+    x = [x for x, y in data][:n]
+    y = [y for x, y in data][:n]
+
+    index = range(len(x))  # todo james zmienic kolejnoc na wykresie
+    plt.bar(x, y, color=['b', 'g'])  # use numbers in the X axis.
+    plt.xticks(index, x)  # set the X ticks and labels
+    plt.show()
 
 
 def hw3():
@@ -61,19 +75,39 @@ def hw2(n=None):
         plt.plot(y, 'g')
 
         # zipf
-        k = 25000
+        k = 27157.65
         z = [k / x if x != 0 else math.inf for x in range(n)]
         plt.plot(z, 'r', label='zipf')
 
         # mandelbrot
-        P = 37500
-        B = 1
-        d = .5
+        P = 34618.562
+        B = 0.981068
+        d = 0.432793
         m = [P / ((x + d) ** B) if x != 0 else math.inf for x in range(n)]
         plt.plot(m, 'b', label='mandelbrot')
 
         plt.legend()
         plt.show()
+
+
+def get_params():
+    with open('./cache/potop.basics.cache.json') as file:
+        data = json.load(file)
+        data = sorted(data.items(), key=lambda kv: (kv[1], kv[0]))[::-1]
+
+        x = [i + 1 for i in range(len(data))]
+        y = [y for x, y in data]
+
+        print(curve_fit(zipf, x, y))
+        print(curve_fit(mandelbrot, x, y))
+
+
+def zipf(x, k):
+    return k / x
+
+
+def mandelbrot(x, P, B, d):
+    return P / ((x + d) ** B)
 
 
 def hw1(n=None):
