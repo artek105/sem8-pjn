@@ -31,9 +31,8 @@ def print_n_grams(ngrams, n):
     x = [x for x, y in data][:n]
     y = [y for x, y in data][:n]
 
-    index = range(len(x))  # todo james zmienic kolejnoc na wykresie
-    plt.bar(x, y, color=['b', 'g'])  # use numbers in the X axis.
-    plt.xticks(index, x)  # set the X ticks and labels
+    plt.plot(y, 'ro')
+    plt.xticks(range(n), x, rotation=90)
     plt.show()
 
 
