@@ -1,35 +1,36 @@
-from lab1.ngrams import NGrams
 from lab2.sjp.dictionary import Dictionary
 import matplotlib.pyplot as plt
 import json
 import math
 from scipy.optimize import curve_fit
+from lab2.wordngrams import WordNGrams
 
 
 def main():
-    hw4()
+    hw4(50)
 
 
-def hw4():
-    with open('./cache/potop.basics.cache.json') as file:
-        data = json.load(file)
+def hw4(n=None):
+    with open('./examples/potop.txt', encoding='UTF-8') as file:
+        ngrams_2 = WordNGrams(2)
+        ngrams_3 = WordNGrams(3)
 
-        ngrams_2 = NGrams(2)
-        ngrams_3 = NGrams(3)
-        for word, count in data.items():
-            ngrams_2.apply_text(word, count)
-            ngrams_3.apply_text(word, count)
+        for line in file:
+            ngrams_2.apply_text(line)
+            ngrams_3.apply_text(line)
 
-        n = 50
         print_n_grams(ngrams_2, n)
         print_n_grams(ngrams_3, n)
 
 
-def print_n_grams(ngrams, n):
+def print_n_grams(ngrams, n=None):
     data = sorted(ngrams.map.items(), key=lambda kv: (kv[1], kv[0]))[::-1]
 
+    n = len(data) if n is None else n
     x = [x for x, y in data][:n]
     y = [y for x, y in data][:n]
+
+    print(x)
 
     plt.plot(y, 'ro')
     plt.xticks(range(n), x, rotation=90)

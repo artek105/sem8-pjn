@@ -16,4 +16,4 @@ class Levenshtein:
 
             old_row = new_row.copy()
 
-        return new_row[len(word2)]
+        return new_row[len(word2)] / max(len(word1), len(word2))

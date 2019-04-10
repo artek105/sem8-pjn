@@ -11,6 +11,8 @@ def get_words_num_map(filename):
     with open(filename, encoding='UTF-8') as file:
         for line in file:
             for word in parse_line(line).split():
+                if not word:
+                    continue
                 _map[word] = 1 if word not in _map else (_map[word] + 1)
 
     return _map

@@ -1,4 +1,5 @@
 import json
+import os
 
 
 class Dictionary:
@@ -10,11 +11,11 @@ class Dictionary:
         self.load_dic()
 
     def load_dic(self):
-        with open(Dictionary.cache_filename, 'r') as file:
-            self.dic = json.load(file)
-
-        if not self.dic:
+        if not os.path.isfile(Dictionary.cache_filename):
             self.dic = Dictionary.prepare()
+        else:
+            with open(Dictionary.cache_filename, 'r') as file:
+                self.dic = json.load(file)
 
     def get_basic_form(self, word):
         return self.dic[word] if word in self.dic else None
