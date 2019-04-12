@@ -1,10 +1,13 @@
+from lab1.main import print_stats
+
+
 class Clusters:
-    def __init__(self, norm_func):
+    def __init__(self):
         self.clusters = []
         self.item_value_getter = lambda x: x
         self.save_item_value_getter = lambda x: x
         self.boundary_func = lambda i1, i2: .5
-        self.norm_func = norm_func
+        self.norm_func = lambda i1, i2: 1
 
     def add_items(self, items):
         i = 0
@@ -85,3 +88,51 @@ class Clusters:
                     value = self.save_item_value_getter(item)
                     file.write(value + '\n')
                 file.write('\n')
+
+    @staticmethod
+    def load(filename):
+        instance = Clusters()
+        with open(filename) as file:
+            cluster = None
+            for line in file:
+                line = line.rstrip('\n')
+
+                if line == '####################':
+                    if cluster is not None:
+                        instance.clusters.append(cluster)
+                    cluster = []
+                    continue
+
+                if cluster is None or not line:
+                    continue
+
+                cluster.append(line)
+
+            if cluster is not None:
+                instance.clusters.append(cluster)
+
+            return instance
+
+    # returns cluster and item indexes
+    def get_cluster_index_by_item(self, search):
+        for index, cluster in enumerate(self.clusters):
+            if search in cluster:
+                return index
+        return None
+
+    def print_stats(self, other):
+        true_positive = true_negative = false_positive = false_negative = 0
+
+        clusters_mapping = self.get_clusters_mapping(other)
+        for cm, cluster in zip(clusters_mapping, self.clusters):
+            indexes = [other.get_cluster_index_by_item(item) for item in cluster]
+            true_positive += indexes.count(cm)
+            false_negative += len(indexes) - indexes.count(cm)
+
+        print_stats(true_positive, false_positive, false_negative, true_negative)
+
+    # map self.clusters to other.clusters index
+    def get_clusters_mapping(self, other):
+        mapped_to_indexes = [[other.get_cluster_index_by_item(item) for item in cluster] for cluster in self.clusters]
+        filtered = [[j for j in i if j is not None] for i in mapped_to_indexes]
+        return [max(indexes, key=indexes.count) if len(indexes) else None for indexes in filtered]

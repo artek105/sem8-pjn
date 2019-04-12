@@ -5,6 +5,13 @@ from lab3.LCS import LCS
 
 
 def main():
+    base = Clusters.load('./data/clusters.txt')
+    clusters = Clusters.load('./output/clusters.lcs.4.txt')
+
+    base.print_stats(clusters)
+
+
+def group_lines():
     with open('./data/lines.txt') as file:
         lines = file.readlines()
         parsed = [(line.rstrip('\n'), Parser.parse(line)) for line in lines]
@@ -13,7 +20,8 @@ def main():
 
         print('items prepared')
 
-        clusters = Clusters(LCS.norm)\
+        clusters = Clusters()\
+            .set_norm_func(LCS.norm)\
             .set_item_value_getter(lambda t: t[1])\
             .set_save_item_value_getter(lambda i: i[0])\
             .set_boundary_func(get_boundary)\
