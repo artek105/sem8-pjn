@@ -5,14 +5,9 @@ class Parser:
     @staticmethod
     def parse(line):
         parsed = Parser.parse_line(line)
-        filtered = Parser.apply_stoplist(parsed)
+        filtered = StopList.apply(parsed)
 
         return filtered.strip()
-
-    @staticmethod
-    def apply_stoplist(line):
-        words = line.split(' ')
-        return ' '.join([word for word in words if word not in StopList.load()])
 
     @staticmethod
     def parse_line(line):
@@ -20,4 +15,4 @@ class Parser:
 
     @staticmethod
     def is_valid_char(c):
-        return c.isalpha() or c == ' ' or c == '\''
+        return c.isalpha() or c in ' @'

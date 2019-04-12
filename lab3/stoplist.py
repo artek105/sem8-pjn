@@ -1,13 +1,68 @@
 from lab2.prepare import get_words_num_map
+import re
 
 
 class StopList:
+    static = None
+    regexes = {
+        r'[^\s]@[^\s]': ' ',
+        r'\s[A-Z]\s': ' ',
+
+        # regex to the end of line
+        r'\sSA\s.*': '',
+        r'\sSP\s.*': '',
+        r'\sUL\s.*': '',
+        r'\sTEL\s.*': '',
+        r'\sRD\s.*': '',
+        r'\sSTR\s.*': '',
+        r'\sCO\s.*': '',
+        r'\sZIP\s.*': '',
+
+        r'\sLLC.*': '',
+        r'\sLTD.*': '',
+        r'\sFAX.*': '',
+        r'\sROAD.*': '',
+        r'\sSTREET.*': '',
+        r'\sCITY.*': '',
+        r'\sDISTRICT.*': '',
+        r'\sLIMITED.*': '',
+
+        r'(?<=LOGISTICS).*': ' ',
+    }
+
     @staticmethod
-    def load():
+    def apply(line):
+        line = StopList.apply_regexes(line)
+        line = StopList.apply_static(line)
+        return line
+
+    @staticmethod
+    def apply_regexes(line):
+        for regex, replacement in StopList.regexes.items():
+            line = re.sub(regex, replacement, line)
+
+        return line
+
+    @staticmethod
+    def apply_static(line):
+        words = line.split()
+        stoplist = StopList.load_static()
+        filtered = ' '.join([word for word in words if word not in stoplist])
+
+        return re.sub(r'\s+', ' ', filtered).strip()
+
+    @staticmethod
+    def load_static():
+        if StopList.static is not None:
+            return StopList.static
+
         with open('./data/stoplist.txt') as source:
             stoplist = source.readlines()
             stoplist = [item.rstrip('\n') for item in stoplist]
-            return [item for item in stoplist if item]
+            stoplist = [item for item in stoplist if item]
+
+            StopList.static = stoplist
+            return stoplist
 
     @staticmethod
     def automatic(ratio=.2):

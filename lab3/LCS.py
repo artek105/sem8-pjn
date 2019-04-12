@@ -1,21 +1,25 @@
 class LCS:  # longest common substring
-    def __init__(self, word1, word2):
-        self.w1 = word1
-        self.w2 = word2
+    @staticmethod
+    def calc_len(x, y):
+        m = len(x)
+        n = len(y)
 
-    def calc_recursive(self, i, j, count):
-        if i == 0 or j == 0:
-            return count
+        old_row = [0] * (n + 1)
+        new_row = [0] * (n + 1)
 
-        if self.w1[i - 1] == self.w2[j - 1]:
-            count = self.calc_recursive(i - 1, j - 1, count + 1)
+        result = 0
+        for i in range(m + 1):
+            for j in range(1, n + 1):
+                if j != 0 and x[i - 1] == y[j - 1]:
+                    new_row[j] = old_row[j - 1] + 1
+                    result = max(result, new_row[j])
 
-        return max(count, max(self.calc_recursive(i, j - 1, 0), self.calc_recursive(i - 1, j, 0)))
+            old_row = new_row
+            new_row = [0] * (n + 1)
 
-    def calc_len(self):
-        return self.calc_recursive(len(self.w1), len(self.w2), 0)
+        return result
 
     @staticmethod
-    def norm(word1, word2):
-        instance = LCS(word1, word2)
-        return 1 - instance.calc_len() / max(len(word1), len(word2))
+    def norm(x, y):
+        return 1 - LCS.calc_len(x, y) / max(len(x), len(y))
+
