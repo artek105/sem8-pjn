@@ -4,7 +4,7 @@ from lab3.levensthein import Levenshtein
 from lab3.LCS import LCS
 
 
-def main():
+def print_stats():
     base = Clusters.load('./data/clusters.txt')
     clusters = Clusters.load('./output/clusters.lcs.4.txt')
 
@@ -52,5 +52,6 @@ def test_norm():
 
 
 if __name__ == '__main__':
-    main()
     # test_norm()
+    # group_lines()
+    print_stats()

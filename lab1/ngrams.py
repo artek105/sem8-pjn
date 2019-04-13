@@ -12,7 +12,7 @@ class NGrams:
         for word in self.parse_line(text).split():
             n_grams = self.collect_n_grams(word)
             for n_gram in n_grams:
-                self.map[n_gram] = count if n_gram not in self.map else (self.map[n_gram] + count)
+                self.map[n_gram] = self.map.get(n_gram, 0) + count
 
     @staticmethod
     def parse_line(line):
@@ -24,6 +24,13 @@ class NGrams:
             n_grams.append(word[start:start + self.n])
 
         return n_grams
+
+    def get_ngram_count(self, ngram):
+        return self.map.get(ngram, 0)
+
+    # get all ngrams count
+    def get_all_ngrams_count(self):
+        return sum(self.map.values())
 
 
 def norm(base, n_grams):
