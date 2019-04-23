@@ -38,7 +38,11 @@ class Levenshtein:
             'nń',
             'oóu',
             'sś',
-            'zźż',
+            'zź',
+            'rzż',
+            'dt',
+            'ij',
+            'wf'
         ]
 
         for comp in comparisons:

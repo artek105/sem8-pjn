@@ -3,11 +3,12 @@ from lab3.levensthein import Levenshtein
 import os
 from lab2.wordngrams import WordNGrams
 import json
+from datetime import datetime
 
 
 class Bayes:
     alpha = 10
-    part_ratio = 2
+    part_ratio = .5
     p_c_smoothing_ratio = .2
     cached_n = None
 
@@ -72,34 +73,73 @@ class Bayes:
             data = json.load(file)
             self.counter.map = data
 
-    def get_best_corrections(self, w, num=10):
+    def get_best_corrections(self, w, num=10, print_times=False):
+        t1 = datetime.now()
+        possible_corrections = self.get_possible_corrections(w)
+        t2 = datetime.now()
+
+        p_list = []
+        for c in possible_corrections:
+            p_list.append((self.p_c_w(c, w), c))
+        t3 = datetime.now()
+
+        p_list.sort(key=lambda x: x[0], reverse=True)
+        t4 = datetime.now()
+
+        if print_times:
+            print('possible corrections:', (t2 - t1).total_seconds())
+            print('p(c|w):', (t3 - t2).total_seconds())
+            print('sort:', (t4 - t3).total_seconds())
+
+        if num is None:
+            num = len(p_list)
+
+        return [c[1] for c in p_list][:num]
+
+    def get_possible_corrections(self, w):
         length = len(w)
-        part_size = int(length / self.part_ratio)
+        part_size = int(length * self.part_ratio)
 
         char_groups = [w[start:start + part_size] for start in range(length - part_size + 1)]
 
-        def consists_from_one_of_char_group(word):
-            for char_group in char_groups:
-                consists = True
-                for char in char_group:
-                    if char not in word:
-                        consists = False
-                        break
+        def has_ordered_chars(string, chars):
+            s_len = len(string)
+            c_len = len(chars)
 
-                if consists:
+            c_index = 0  # index of character in chars
+            for s_index, char in enumerate(string):
+                # s_len - s_index  - char num to check
+                # part_size - c_index  - char num, which could be char to check
+                # first expr should be grater or equal to second expr
+                if s_len - s_index < part_size - c_index:
+                    break
+
+                if char == chars[c_index]:
+                    c_index += 1
+
+                if c_index >= c_len:
                     return True
 
             return False
 
-        c_list = self.dic.get(str(length), [])
-        c_list.extend(self.dic.get(str(length - 1), []))
-        c_list.extend(self.dic.get(str(length + 1), []))
-        filtered = [c for c in c_list if consists_from_one_of_char_group(c)]
+        def consists_from_one_of_char_group(word):
+            if len(char_groups) == 0:
+                return True
 
-        p_list = []
-        for c in filtered:
-            p_list.append((self.p_c_w(c, w), c))
+            for char_group in char_groups:
+                if has_ordered_chars(word, char_group):
+                    return True
 
-        p_list.sort(key=lambda x: x[0], reverse=True)
+            return False
 
-        return [c[1] for c in p_list][:num]
+        possible_corrections = []
+        for c_list in [
+            self.dic.get(str(length), []),
+            self.dic.get(str(length - 1), []),
+            self.dic.get(str(length + 1), [])
+        ]:
+            for c in c_list:
+                if (c[0:1] == w[0:1] or c[1:2] == w[0:1] or c[0:1] == w[1:2]) and consists_from_one_of_char_group(c):
+                    possible_corrections.append(c)
+
+        return possible_corrections
